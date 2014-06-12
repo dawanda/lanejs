@@ -1,0 +1,28 @@
+{
+  "name": "lanejs",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dawanda/lanejs",
+  "authors": [
+    "DaWanda GmbH"
+  ],
+  "description": "A Ruby on Rails like Javascript Framework",
+  "main": "./dist/lanejs.js",
+  "keywords": [
+    "Javascript",
+    "MVC",
+    "Framework"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "2.0.x",
+    "lodash": "2.x.x",
+    "moment": "2.7.x"
+  }
+}
