@@ -17,7 +17,7 @@ gem 'rails-assets-lanejs'
 ## Building and Testing
 
 ### Install Dependencies
-For building and testing it is neccessary to install npm and run `npm install`.
+For building and testing it is neccessary to install npm and run `npm install --dev`.
 
 It is recommended to install the [grunt-cli](https://github.com/gruntjs/grunt-cli) and [karma-cli](https://github.com/karma-runner/karma-cli) tool:
 ```
