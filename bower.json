@@ -24,7 +24,7 @@
     "jquery": "2.0.x",
     "lodash": "2.x.x",
     "moment": "2.7.x",
-    "cartograph": "0.x.x",
+    "cartograph": "0.1.x",
     "eventspitter": "0.x.x",
     "loud-accessors": "0.x.x",
     "submachine": "0.1.x"
