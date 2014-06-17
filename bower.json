@@ -27,6 +27,6 @@
     "cartograph": "0.x.x",
     "eventspitter": "0.x.x",
     "loud-accessors": "0.x.x",
-    "submachine": "0.x.x"
+    "submachine": "0.1.x"
   }
 }
