@@ -7,12 +7,6 @@ module.exports = (grunt) ->
         targetDir: "./vendor"
       install: { }
 
-    curl:
-      'vendor/cartograph.js':     'https://raw.githubusercontent.com/dawanda/cartograph/master/lib/cartograph.js'
-      'vendor/eventspitter.js':   'https://raw.githubusercontent.com/lucaong/eventspitter/master/lib/eventspitter.js'
-      'vendor/loud-accessors.js': 'https://raw.githubusercontent.com/lucaong/loud-accessors/master/lib/loud-accessors.js'
-      'vendor/submachine.js':     'https://raw.githubusercontent.com/lucaong/submachine/master/lib/submachine.js'
-
     meta:
       banner:
         '// lanejs\n' +
@@ -25,7 +19,7 @@ module.exports = (grunt) ->
         options:
           join: true
         files:
-          'dist/lib.js': [
+          'dist/lanejs.js': [
             'src/namespace.js.coffee'
             'src/module.js.coffee'
             'src/timeout.js.coffee'
@@ -43,14 +37,6 @@ module.exports = (grunt) ->
             'src/url_builder.js.coffee'
           ]
 
-    concat:
-      all:
-        files:
-          'dist/lanejs.js': [
-            'vendor/**/*.js'
-            'dist/lib.js'
-          ]
-
     uglify:
       all:
         options:
@@ -62,7 +48,7 @@ module.exports = (grunt) ->
       options:
         basePath: ''
         configFile: 'karma.conf.js'
-        loadFiles: [ 'dist/lanejs.js', 'spec/**/*.coffee' ]
+        loadFiles: [ 'vendor/**/*.js', 'dist/lanejs.js', 'spec/**/*.coffee' ]
       continuous: { }
 
     clean: ["dist/lib.js"]
@@ -83,4 +69,4 @@ module.exports = (grunt) ->
 
   # Run with grunt release, grunt release:minor
 
-  grunt.registerTask 'build',   ['bower:install', 'curl', 'coffee', 'concat', 'clean', 'uglify', 'karma:continuous']
+  grunt.registerTask 'build',   ['bower:install', 'coffee', 'clean', 'uglify', 'karma:continuous']
