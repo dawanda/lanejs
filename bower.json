@@ -24,9 +24,9 @@
     "jquery": "2.0.x",
     "lodash": "2.x.x",
     "moment": "2.7.x",
-    "cartograph": "x.x.x",
-    "eventspitter": "x.x.x",
-    "loud-accessors": "x.x.x",
-    "submachine": "x.x.x"
+    "cartograph": "0.x.x",
+    "eventspitter": "0.x.x",
+    "loud-accessors": "0.x.x",
+    "submachine": "0.x.x"
   }
 }
