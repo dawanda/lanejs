@@ -1,4 +1,5 @@
 # lanejs
+[![Build Status](https://travis-ci.org/dawanda/lanejs.svg?branch=master)](https://travis-ci.org/dawanda/lanejs)
 
 lanejs is a Ruby on Rails like MVC framework for javascript written in coffeescript. You can use it for SEO friendly pages.
 
