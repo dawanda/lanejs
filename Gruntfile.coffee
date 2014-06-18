@@ -45,11 +45,17 @@ module.exports = (grunt) ->
           'dist/lanejs.min.js': 'dist/lanejs.js'
 
     karma:
-      options:
-        basePath: ''
-        configFile: 'karma.conf.js'
-        loadFiles: [ 'vendor/**/*.js', 'dist/lanejs.js', 'spec/**/*.coffee' ]
-      continuous: { }
+      normal:
+        options:
+          basePath: ''
+          configFile: 'karma.conf.js'
+          loadFiles: [ 'vendor/**/*.js', 'dist/lanejs.js', 'spec/**/*.coffee' ]
+      travis:
+        options:
+          basePath: ''
+          configFile: 'karma.conf.js'
+          loadFiles: [ 'vendor/**/*.js', 'dist/lanejs.js', 'spec/**/*.coffee' ]
+          browsers: ['PhantomJS']
 
     clean: ["dist/lib.js"]
 
@@ -69,4 +75,6 @@ module.exports = (grunt) ->
 
   # Run with grunt release, grunt release:minor
 
-  grunt.registerTask 'build',   ['bower:install', 'coffee', 'clean', 'uglify', 'karma:continuous']
+  grunt.registerTask 'build',   ['bower:install', 'coffee', 'clean', 'uglify', 'karma:normal']
+
+  grunt.registerTask 'travis',  ['bower:install', 'coffee', 'clean', 'uglify', 'karma:travis']
