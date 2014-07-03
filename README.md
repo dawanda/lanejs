@@ -5,6 +5,72 @@ lanejs is a Ruby on Rails like MVC framework for javascript written in coffeescr
 
 ## Getting Started
 
+### Create a Model
+```coffee
+namespace "DaWanda.Models.Message", ->
+
+  class Message extends Lib.Model
+    @attrAccessible "subject", "text", "from", "to", "image_field", "hidden", "subject_type", "subject_id"
+    @validates "from", presence: true
+    @validates "subject", presence: true
+    @validates "text", presence: true
+    @validates "to", presence: true
+    @validates "image_field", format:
+      with: /.*\.(jpg|jpeg|png|gif)$/i
+      message: I18n.t("errors.messages.file_format_invalid")
+
+    # Use Crud to load and save data from JSON
+    @extend Lib.Crud
+    @resource "message"
+    @endpoint "/core/messages"
+```
+
+### Create a Controller
+```coffee
+namespace "DaWanda.Controllers.MessagesController", ->
+
+  class MessagesController extends Lib.Controller
+
+    @beforeFilter '_doSomething'
+
+    index: ->
+      @messages = [new DaWanda.Models.Message(from: "me", to: "you", subject: "i like you", text: "really <3")]
+
+    new: ->
+      @message = new DaWanda.Models.Message()
+
+    edit: ->
+      DaWanda.Models.Message.find(id: @params["id"]).done ( message ) =>
+        @message = message
+
+    _doSomething: ->
+      # TODO
+
+```
+
+### Create Routes File
+```coffee
+Lib.Router.draw ->
+
+  @match "/foo/:id", "foo#show"
+
+  # Map a resource (will look for UsersController
+  # and map index, show, new and update actions)
+  @resources "users", ->
+    # You can add additional members/collection actions
+    @member "profile"
+    @collection "top_influencers"
+
+  # You can nest resources too
+  @resources "shops", ->
+    @resources "products"
+
+  # Map a singular resource (will look for CartController
+  # and map show, new and edit actions)
+  @resource "cart"
+```
+
+### Create a Stateful Widget
 ### Integrate with rivets.js
 ### Integrate with eco
 ### Use with [rails-assets.org](https://rails-assets.org/)
