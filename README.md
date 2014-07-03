@@ -1,3 +1,4 @@
+![LaneJS](http://i.imgur.com/ARmKHa4.png)
 # lanejs
 [![Build Status](https://travis-ci.org/dawanda/lanejs.svg?branch=master)](https://travis-ci.org/dawanda/lanejs)
 
