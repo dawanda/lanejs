@@ -1035,7 +1035,7 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       __extends(Router, _super);
 
       camelize = function(str) {
-        return str.replace(/(?:^|[-_])(\w)/g, function(m, c) {
+        return str.replace("/", "").replace(/(?:^|[-_])(\w)/g, function(m, c) {
           return (c || "").toUpperCase();
         });
       };
