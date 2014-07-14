@@ -18,7 +18,7 @@ namespace "Lib.Router", ->
     # Private
 
     camelize = ( str ) ->
-      str.replace /(?:^|[-_])(\w)/g, ( m, c ) ->
+      str.replace("/", "").replace /(?:^|[-_])(\w)/g, ( m, c ) ->
         ( c || "" ).toUpperCase()
 
     isArray = Array.isArray || ( maybe_array ) ->

@@ -44,14 +44,14 @@ describe "Lib.Router", ->
         Foo:
           BarController: {}
       @router.controllers = ns
-      @router.namespace "foo", ->
+      @router.namespace "/foo", ->
         expect( @resourceToController "bar" ).toBe ns.Foo.BarController
 
     it "adds URL scoping", ->
       spy = jasmine.createSpy()
-      @router.namespace "foo", ->
+      @router.namespace "/foo", ->
         @map "/bar", spy
-      @router.route "foo/bar"
+      @router.route "/foo/bar"
       expect( spy ).toHaveBeenCalled()
 
   describe "scope", ->
