@@ -95,6 +95,8 @@ npm install -g karma-cli
 
 ### Build Project
 
+To install the runtime dependencies and build the project just run `grunt build`.
+
 ### Run Tests
 Tests are running with [karma.js](http://karma-runner.github.io/) and are built with [jasmine](http://jasmine.github.io/).
 ```
