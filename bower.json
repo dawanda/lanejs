@@ -21,7 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "2.1.x",
+    "jquery": "2.x.x",
     "lodash": "2.x.x",
     "moment": "2.7.x",
     "cartograph": "0.1.x",
