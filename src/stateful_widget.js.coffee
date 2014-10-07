@@ -52,6 +52,7 @@ namespace "Lib.StatefulWidget", ->
     constructor: ( selector ) ->
       @_uid ?= @_generateUID()
       @$el = $( selector )
+      throw new Error "Unable to select DOM element with selector '#{selector}'" unless @$el.length
       @el = @$el[0]
       @initState @_states[0] if @_states?[0]?
       @_bindEvents()
