@@ -126,12 +126,32 @@ class LengthValidator extends BaseValidator
     obj.addError @attribute, @options.too_short if @options.min? and value.length < @options.min
     obj.addError @attribute, @options.wrong_length if @options.is? and value.length != @options.is
 
+# ConfirmationValidator
+#
+# Validates confirmation of an attribute, checking that its value is equal to
+# another attribute named the same, plus a '_confirmation' suffix.
+#
+class ConfirmationValidator extends BaseValidator
+
+  constructor: ( attr, opts ) ->
+    super attr, opts
+    @attribute = attr
+    @options.message ?= I18n.t("errors.messages.confirmed")
+
+  run: ( obj ) ->
+    value           = obj.get( @attribute )
+    confirmed_value = obj.get( @attribute + "_confirmation" )
+    return unless value? and ( value + "" ).length > 0
+    unless value is confirmed_value
+      obj.addError @attribute, @options.message
+
 
 namespace "Lib.Validators", ->
   # Export validators
-  BaseValidator:       BaseValidator
-  PresenceValidator:   PresenceValidator
-  FormatValidator:     FormatValidator
-  AcceptanceValidator: AcceptanceValidator
-  RangeValidator:      RangeValidator
-  LengthValidator:     LengthValidator
+  BaseValidator:         BaseValidator
+  PresenceValidator:     PresenceValidator
+  FormatValidator:       FormatValidator
+  AcceptanceValidator:   AcceptanceValidator
+  RangeValidator:        RangeValidator
+  LengthValidator:       LengthValidator
+  ConfirmationValidator: ConfirmationValidator
