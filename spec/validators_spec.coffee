@@ -264,14 +264,14 @@ describe "Lib.Validators", ->
     it "adds a validation that adds no errors if the attribute is not present", ->
       v = new @V.ConfirmationValidator "foo"
       spyOn @model, "addError"
-      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then "something" else undefined
+      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then undefined else "something"
       v.validate @model
       expect( @model.addError ).not.toHaveBeenCalled()
 
     it "adds a validation that adds no errors if the attribute is empty", ->
       v = new @V.ConfirmationValidator "foo"
       spyOn @model, "addError"
-      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then "something" else ""
+      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then "" else "something"
       v.validate @model
       expect( @model.addError ).not.toHaveBeenCalled()
 
