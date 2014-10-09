@@ -258,3 +258,41 @@ describe "Lib.Validators", ->
         return "13 characters"
       pv.validate @model
       expect( @model.addError ).not.toHaveBeenCalled()
+
+  describe "ConfirmationValidator", ->
+
+    it "adds a validation that adds no errors if the attribute is not present", ->
+      v = new @V.ConfirmationValidator "foo"
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then "something" else undefined
+      v.validate @model
+      expect( @model.addError ).not.toHaveBeenCalled()
+
+    it "adds a validation that adds no errors if the attribute is empty", ->
+      v = new @V.ConfirmationValidator "foo"
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) -> if attr is "foo" then "something" else ""
+      v.validate @model
+      expect( @model.addError ).not.toHaveBeenCalled()
+
+    it "adds a validation that adds an error if the attribute is different from confirmation", ->
+      v = new @V.ConfirmationValidator "foo"
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        if attr is "foo"
+          "something"
+        else if attr is "foo_confirmation"
+          "something else"
+        else null
+      v.validate @model
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "other"
+
+    it "adds a validation that adds no error if the attribute is confirmed", ->
+      v = new @V.ConfirmationValidator "foo"
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        if attr is "foo" or attr is "foo_confirmation"
+          "something"
+        else null
+      v.validate @model
+      expect( @model.addError ).not.toHaveBeenCalled()
