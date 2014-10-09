@@ -139,7 +139,11 @@ class ConfirmationValidator extends BaseValidator
     @options.message ?= I18n.t("errors.messages.confirmed")
 
   run: ( obj ) ->
-    obj.addError @attribute, @options.message unless obj.get( @attribute ) is obj.get( @attribute + "_confirmation" )
+    value           = obj.get( @attribute )
+    confirmed_value = obj.get( @attribute + "_confirmation" )
+    return unless value? and ( value + "" ).length > 0
+    unless value is confirmed_value
+      obj.addError @attribute, @options.message
 
 
 namespace "Lib.Validators", ->
