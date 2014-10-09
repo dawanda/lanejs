@@ -63,6 +63,9 @@ namespace "Lib.Model", ->
     @validatesServerSideOf: ( attr, opts ) ->
       @validatesWith Lib.Validators.ServerSideValidator, attr, opts
 
+    @validatesConfirmationOf: ( attr, opts ) ->
+      @validatesWith Lib.Validators.ConfirmationValidator, attr, opts
+
     @validates: ( attr, validations ) ->
       for type, opts of validations
         capitalized = type.charAt(0).toUpperCase() + type[1..]
