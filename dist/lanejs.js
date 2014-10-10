@@ -30,7 +30,7 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
  */
 
 (function() {
-  var AcceptanceValidator, BaseValidator, FormatValidator, I18n, LengthValidator, PresenceValidator, RangeValidator,
+  var AcceptanceValidator, BaseValidator, ConfirmationValidator, FormatValidator, I18n, LengthValidator, PresenceValidator, RangeValidator,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -184,6 +184,10 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
 
       Model.validatesServerSideOf = function(attr, opts) {
         return this.validatesWith(Lib.Validators.ServerSideValidator, attr, opts);
+      };
+
+      Model.validatesConfirmationOf = function(attr, opts) {
+        return this.validatesWith(Lib.Validators.ConfirmationValidator, attr, opts);
       };
 
       Model.validates = function(attr, validations) {
@@ -1253,6 +1257,9 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
           this._uid = this._generateUID();
         }
         this.$el = $(selector);
+        if (!this.$el.length) {
+          throw new Error("Unable to select DOM element with selector '" + selector + "'");
+        }
         this.el = this.$el[0];
         if (((_ref = this._states) != null ? _ref[0] : void 0) != null) {
           this.initState(this._states[0]);
@@ -1607,6 +1614,34 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
 
   })(BaseValidator);
 
+  ConfirmationValidator = (function(_super) {
+    __extends(ConfirmationValidator, _super);
+
+    function ConfirmationValidator(attr, opts) {
+      var _base;
+      ConfirmationValidator.__super__.constructor.call(this, attr, opts);
+      this.attribute = attr;
+      if ((_base = this.options).message == null) {
+        _base.message = I18n.t("errors.messages.confirmed");
+      }
+    }
+
+    ConfirmationValidator.prototype.run = function(obj) {
+      var confirmed_value, value;
+      value = obj.get(this.attribute);
+      confirmed_value = obj.get(this.attribute + "_confirmation");
+      if (!((value != null) && (value + "").length > 0)) {
+        return;
+      }
+      if (value !== confirmed_value) {
+        return obj.addError(this.attribute, this.options.message);
+      }
+    };
+
+    return ConfirmationValidator;
+
+  })(BaseValidator);
+
   namespace("Lib.Validators", function() {
     return {
       BaseValidator: BaseValidator,
@@ -1614,7 +1649,8 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       FormatValidator: FormatValidator,
       AcceptanceValidator: AcceptanceValidator,
       RangeValidator: RangeValidator,
-      LengthValidator: LengthValidator
+      LengthValidator: LengthValidator,
+      ConfirmationValidator: ConfirmationValidator
     };
   });
 
