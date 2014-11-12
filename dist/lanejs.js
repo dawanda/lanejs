@@ -1621,6 +1621,7 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       var _base;
       ConfirmationValidator.__super__.constructor.call(this, attr, opts);
       this.attribute = attr;
+      this.confirmed_attribute = this.options.confirmed_attribute || this.attribute + "_confirmation";
       if ((_base = this.options).message == null) {
         _base.message = I18n.t("errors.messages.confirmed");
       }
@@ -1629,12 +1630,12 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
     ConfirmationValidator.prototype.run = function(obj) {
       var confirmed_value, value;
       value = obj.get(this.attribute);
-      confirmed_value = obj.get(this.attribute + "_confirmation");
+      confirmed_value = obj.get(this.confirmed_attribute);
       if (!((value != null) && (value + "").length > 0)) {
         return;
       }
       if (value !== confirmed_value) {
-        return obj.addError(this.attribute, this.options.message);
+        return obj.addError(this.confirmed_attribute, this.options.message);
       }
     };
 
