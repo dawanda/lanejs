@@ -285,7 +285,7 @@ describe "Lib.Validators", ->
           "something else"
         else null
       v.validate @model
-      expect( @model.addError ).toHaveBeenCalledWith "foo", "confirmed"
+      expect( @model.addError ).toHaveBeenCalledWith "foo_confirmation", "confirmed"
 
     it "adds a validation that adds no error if the attribute is confirmed", ->
       v = new @V.ConfirmationValidator "foo"
