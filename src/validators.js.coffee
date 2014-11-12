@@ -144,7 +144,7 @@ class ConfirmationValidator extends BaseValidator
     confirmed_value = obj.get( @confirmed_attribute )
     return unless value? and ( value + "" ).length > 0
     unless value is confirmed_value
-      obj.addError @attribute, @options.message
+      obj.addError @confirmed_attribute, @options.message
 
 
 namespace "Lib.Validators", ->
