@@ -1,5 +1,5 @@
 describe "Lib.Module", ->
-  
+
   beforeEach ->
     @Mod = Lib.Module
 
@@ -7,7 +7,7 @@ describe "Lib.Module", ->
     delete @Mod
 
   describe "extend", ->
- 
+
     it "copies over class methods", ->
       @Mod.extend
         foo: 123
@@ -15,13 +15,13 @@ describe "Lib.Module", ->
       expect( @Mod ).toMatch
         foo: 123
         bar: 321
- 
+
     it "calls extended callback if defined, passing the extended class", ->
       spy = jasmine.createSpy()
       @Mod.extend
         extended: spy
       expect( spy ).toHaveBeenCalledWith @Mod
- 
+
     it "does not copy over 'extended' nor 'included' properties", ->
       @Mod.extend
         extended: ->
@@ -30,7 +30,7 @@ describe "Lib.Module", ->
       expect( @Mod.included ).not.toBeDefined()
 
   describe "include", ->
- 
+
     it "copies over instance methods", ->
       @Mod.include
         foo: 123
@@ -38,7 +38,7 @@ describe "Lib.Module", ->
       expect( @Mod:: ).toMatch
         foo: 123
         bar: 321
- 
+
     it "calls included callback if defined, passing the including class", ->
       spy = jasmine.createSpy()
       @Mod.include
