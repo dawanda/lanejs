@@ -78,3 +78,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'build',   ['bower:install', 'coffee', 'clean', 'uglify', 'karma:normal']
 
   grunt.registerTask 'travis',  ['bower:install', 'coffee', 'clean', 'uglify', 'karma:travis']
+
+  grunt.registerTask 'default', ['build']
