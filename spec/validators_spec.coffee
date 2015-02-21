@@ -177,6 +177,30 @@ describe "Lib.Validators", ->
       fv.validate @model
       expect( @model.addError ).toHaveBeenCalledWith "foo", "not in_range"
 
+    it "adds a validation that has min and max as functions", ->
+      minFunc = -> 0.5 * @get("bar")
+      maxFunc = -> 2 * @get("bar")
+      foobar = { bar: 10, foo: 15 }
+      fv = new @V.RangeValidator "foo", min: minFunc, max: maxFunc
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        foobar[attr]
+      fv.validate @model
+      expect( @model.addError ).not.toHaveBeenCalled()
+
+    it "adds a validation that has min and max as functions and handles attribute dependent functions properly", ->
+      minFunc = -> 0.5 * @get("bar")
+      maxFunc = -> 2 * @get("bar")
+      foobar = { bar: 10, foo: 15 }
+      fv = new @V.RangeValidator "foo", min: minFunc, max: maxFunc
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        foobar[attr]
+      fv.validate @model
+      foobar.bar = 2
+      fv.validate @model
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "not in_range"
+
   describe "AcceptanceValidator", ->
 
     it "adds no errors if the attribute has the acceptance value", ->
