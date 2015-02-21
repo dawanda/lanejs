@@ -68,15 +68,17 @@ class RangeValidator extends BaseValidator
   constructor: ( attr, opts ) ->
     super attr, opts
     @attribute = attr
+    @options.minFunc = @options.min if @options.min? and typeof @options.min is "function"
+    @options.maxFunc = @options.max if @options.max? and typeof @options.max is "function"
     @options.message ?= I18n.t("errors.messages.not_in_range")
 
   run: ( obj ) ->
     value = obj.get @attribute
     return unless value? and ( value + "" ).length > 0 and (@options.max? or @options.min?)
-    if @options.min? and typeof @options.min is "function"
-      @options.min = @options.min.call( obj )
-    if @options.max? and typeof @options.max is "function"
-      @options.max = @options.max.call( obj )
+    if @options.minFunc?
+      @options.min = @options.minFunc.call( obj )
+    if @options.maxFunc?
+      @options.max = @options.maxFunc.call( obj )
 
     if @options.min? and typeof @options.min is "object" and @options.min._isAMomentObject and !value.min(@options.min)
       obj.addError @attribute, @options.message
