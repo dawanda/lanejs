@@ -278,12 +278,19 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       };
 
       Model.prototype.isValid = function(opts) {
-        var error;
+        var error, num_errors;
         this.validate(opts);
-        for (error in this.errors) {
-          return false;
-        }
-        return true;
+        num_errors = ((function() {
+          var _ref, _results;
+          _ref = this.errors;
+          _results = [];
+          for (error in _ref) {
+            if (!__hasProp.call(_ref, error)) continue;
+            _results.push(error);
+          }
+          return _results;
+        }).call(this)).length;
+        return num_errors === 0;
       };
 
       Model.prototype.isBlank = function() {
@@ -1530,6 +1537,12 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       var _base;
       RangeValidator.__super__.constructor.call(this, attr, opts);
       this.attribute = attr;
+      if ((this.options.min != null) && typeof this.options.min === "function") {
+        this.options.minFunc = this.options.min;
+      }
+      if ((this.options.max != null) && typeof this.options.max === "function") {
+        this.options.maxFunc = this.options.max;
+      }
       if ((_base = this.options).message == null) {
         _base.message = I18n.t("errors.messages.not_in_range");
       }
@@ -1541,11 +1554,11 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
       if (!((value != null) && (value + "").length > 0 && ((this.options.max != null) || (this.options.min != null)))) {
         return;
       }
-      if ((this.options.min != null) && typeof this.options.min === "function") {
-        this.options.min = this.options.min.call(obj);
+      if (this.options.minFunc != null) {
+        this.options.min = this.options.minFunc.call(obj);
       }
-      if ((this.options.max != null) && typeof this.options.max === "function") {
-        this.options.max = this.options.max.call(obj);
+      if (this.options.maxFunc != null) {
+        this.options.max = this.options.maxFunc.call(obj);
       }
       if ((this.options.min != null) && typeof this.options.min === "object" && this.options.min._isAMomentObject && !value.min(this.options.min)) {
         return obj.addError(this.attribute, this.options.message);
