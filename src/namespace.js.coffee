@@ -29,16 +29,28 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
 
 ###
 
-window.namespace = ( ns, fn ) ->
-  segments = ns.split "."
-  last_segment = segments[ segments.length - 1 ]
-  parent = window
-  if fn? and typeof fn is not "function"
-    throw new TypeError("second argument of 'namespace' should be a function")
-  for segment in segments
-    if segment is last_segment and fn?
-      parent[ segment ] = fn()
-    else
-      parent[ segment ] ?= {}
-    parent = parent[ segment ]
-  parent
+# Use UMD for better future compatibility https://github.com/umdjs/umd
+
+((root, factory) ->
+  if typeof define is "function" and define.amd?
+    define [], ->
+      root.namespace = factory(root)
+  else if typeof exports is "object"
+    module.exports = factory(root)
+  else
+    root.namespace = factory(root)
+)(this, (root) ->
+  ( ns, fn ) ->
+    segments = ns.split "."
+    last_segment_index = segments.length - 1
+    parent = root
+    if fn? and typeof fn isnt "function"
+      throw new TypeError("second argument of 'namespace' should be a function")
+    for segment, index in segments
+      if index is last_segment_index and fn?
+        parent[ segment ] = fn()
+      else
+        parent[ segment ] ?= {}
+      parent = parent[ segment ]
+    parent
+)
