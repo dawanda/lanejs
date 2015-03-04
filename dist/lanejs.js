@@ -36,27 +36,39 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  window.namespace = function(ns, fn) {
-    var last_segment, parent, segment, segments, _i, _len;
-    segments = ns.split(".");
-    last_segment = segments[segments.length - 1];
-    parent = window;
-    if ((fn != null) && typeof fn === !"function") {
-      throw new TypeError("second argument of 'namespace' should be a function");
+  (function(root, factory) {
+    if (typeof define === "function" && (define.amd != null)) {
+      return define([], function() {
+        return root.namespace = factory(root);
+      });
+    } else if (typeof exports === "object") {
+      return module.exports = factory(root);
+    } else {
+      return root.namespace = factory(root);
     }
-    for (_i = 0, _len = segments.length; _i < _len; _i++) {
-      segment = segments[_i];
-      if (segment === last_segment && (fn != null)) {
-        parent[segment] = fn();
-      } else {
-        if (parent[segment] == null) {
-          parent[segment] = {};
-        }
+  })(this, function(root) {
+    return function(ns, fn) {
+      var index, last_segment_index, parent, segment, segments, _i, _len;
+      segments = ns.split(".");
+      last_segment_index = segments.length - 1;
+      parent = root;
+      if ((fn != null) && typeof fn !== "function") {
+        throw new TypeError("second argument of 'namespace' should be a function");
       }
-      parent = parent[segment];
-    }
-    return parent;
-  };
+      for (index = _i = 0, _len = segments.length; _i < _len; index = ++_i) {
+        segment = segments[index];
+        if (index === last_segment_index && (fn != null)) {
+          parent[segment] = fn();
+        } else {
+          if (parent[segment] == null) {
+            parent[segment] = {};
+          }
+        }
+        parent = parent[segment];
+      }
+      return parent;
+    };
+  });
 
   namespace("Lib.Module", function() {
     var Module, module_keywords;
