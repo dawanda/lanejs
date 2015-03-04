@@ -121,6 +121,8 @@ class RangeValidator extends BaseValidator
   constructor: ( attr, opts ) ->
     super attr, opts
     @attribute = attr
+    @options.minFunc = @options.min if @options.min? and typeof @options.min is "function"
+    @options.maxFunc = @options.max if @options.max? and typeof @options.max is "function"
     @options.message ?= I18n.t("errors.messages.not_in_range")
 
   run: ( obj ) ->
@@ -128,18 +130,11 @@ class RangeValidator extends BaseValidator
     # ignore blank values and when both max and min options are missing
     return unless value? and ( value + "" ).length > 0 and (@options.max? or @options.min?)
 
-    # call min and max in context of object if they are functions
-    #
-    # NOTE: doesn't feel right thing to do for me, because it mutates
-    # @options.min (and .max), which means that this function will be
-    # executed only once and if it actually depends on some state of
-    # the object, then we got ourselves a problem. Looks like should be
-    # a local variable here. If it is not the case, then why it is called
-    # in context of target object?
-    if @options.min? and typeof @options.min is "function"
-      @options.min = @options.min.call( obj )
-    if @options.max? and typeof @options.max is "function"
-      @options.max = @options.max.call( obj )
+    # Use the initially provided functions for min and max to update their values
+    if @options.minFunc?
+      @options.min = @options.minFunc.call( obj )
+    if @options.maxFunc?
+      @options.max = @options.maxFunc.call( obj )
 
     # checks if actual value of attribute is between min and max,
     # accounting for possible absence of one of them
