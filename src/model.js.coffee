@@ -42,12 +42,25 @@ namespace "Lib.Model", ->
 
     # Class methods
 
+    # Adds aribtrary validation object to the list of validations for
+    # current class
+    # @param validation - validator object to add
     @addValidation: ( validation ) ->
+      # ensures that _validations is defined, default value is empty list
       @::_validations ?= []
+      # ensures that current class has own _validations copy and its
+      # modification will not touch any ancestor classess
       unless @::hasOwnProperty "_validations"
         @::_validations = @::_validations[..]
+      # does the job - appends validation object to _validations
       @::_validations.push validation
 
+    #=begin validates<Name>Of
+    #
+    # These validates<Name>Of all just delegate to validatesWith and
+    # pass in built in validator class
+    # @param attr - name of attribute to run validations on
+    # @param opts - any options that builtin validator accept
     @validatesPresenceOf: ( attr, opts ) ->
       @validatesWith Lib.Validators.PresenceValidator, attr, opts
 
@@ -65,12 +78,34 @@ namespace "Lib.Model", ->
 
     @validatesConfirmationOf: ( attr, opts ) ->
       @validatesWith Lib.Validators.ConfirmationValidator, attr, opts
+    #=end validates<Name>Of
 
+    # DSL-ish way to add builtin validators to model
+    # @param attr - name of attribute to run validations on
+    # @param validations - hash map where key is the <name> of builtin
+    # validator and value is its options
+    # Makes such DSL possible:
+    #
+    # ```coffee
+    #   @validates "email",
+    #     presence: true
+    #     format:
+    #       with: /put_your_email_regex_here/
+    #       message: I18n.t("errors.users.email.invalid_format")
+    # ```
     @validates: ( attr, validations ) ->
+      # type - lowercased builtin validator name, opts - its options
       for type, opts of validations
+        # capitalizes type
         capitalized = type.charAt(0).toUpperCase() + type[1..]
+        # delegates to corresponding validates<Name>Of method
         @["validates#{capitalized}Of"] attr, opts
 
+    # Instantiates object of Validator class passing all other
+    # arguments to its constructor and delegates to addValidation
+    # method passing this object in
+    # @param Validator - builtin validator class
+    # @param args... - other arguments to pass to constructor of Validator
     @validatesWith: ( Validator, args... ) ->
       @addValidation new Validator args...
 
@@ -83,30 +118,52 @@ namespace "Lib.Model", ->
 
     # Instance methods
 
+    # Runs all validators
+    # @param opts - options:
+    #   - option silent - will not emit any events if it is true, but
+    #     still will append any errors to @errors
     validate: ( opts ) ->
       @errors   = {}
       results   = []
       silent    = opts? and opts.silent
+      # create new Future
       dfd       = new $.Deferred
       @emit "validate" unless silent
+      # call all validators with validate method passing in current
+      # model instance object
       for validation in @_validations || []
         results.push validation.validate(@)
 
-      # if it is not a Deferred will be done immediately
+      # wraps all validation.validate results in $() and registers
+      # done callback on them. This is required for any validations
+      # that return futures/promises - ie they are async
+      # for normal results (non-async) callback gets called immediately
       $.when.apply($, results).done () =>
+        # don't emit any validation errors if in silent mode
         unless silent
+          # start with valid state
           valid = true
+          # iterate over all kev-value pairs in @errors hash map
           for attr, errors of @errors
+            # emit validation error
             @emit "invalid:#{attr}", errors
+            # switch to invalid state
             valid = false
+          # emit valid or invalid callback depending on resulting state
           @emit if valid then "valid" else "invalid"
+        # mark future as finished
         dfd.resolve()
 
+      # return future's promise
       dfd.promise()
 
+    # Returns true if model instance object is valid, otherwise -
+    # false
     # Should only be used when there is no
     # asynchronous validation
+    # @param opts - options for validate method call
     isValid: ( opts ) ->
+      # delegates to validate
       @validate opts
       num_errors = (error for own error of @errors).length
       return num_errors == 0
@@ -124,11 +181,21 @@ namespace "Lib.Model", ->
 
       true
 
+    # Adds an error to @errors hash map
+    # @param name - attribute name = key for @errors hash map
+    # @param message - error message = value for @errors hash map
     addError: ( name, message ) ->
+      # initializes @errors with empty hash map if it is not defined
       @errors ?= {}
+      # initializes errors entry for attribute with empty list if it is not defined
       @errors[ name ] ?= []
+      # appends error message for attribute
       @errors[ name ].push message
 
+    # Adds a base error to @errors hash map
+    # Delegates to addError with attribute name = _base_
+    # Usually _base_ error means that validation failed for whole
+    # object and it is not particularly related to any attribute
     addErrorToBase: ( message ) ->
       @addError "_base_", message
 
