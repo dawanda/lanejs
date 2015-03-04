@@ -39,8 +39,6 @@ module.exports = (grunt) ->
 
     uglify:
       all:
-        options:
-          report: 'gzip'
         files:
           'dist/lanejs.min.js': 'dist/lanejs.js'
 
