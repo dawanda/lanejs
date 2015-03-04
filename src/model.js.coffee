@@ -108,9 +108,8 @@ namespace "Lib.Model", ->
     # asynchronous validation
     isValid: ( opts ) ->
       @validate opts
-      for error of @errors
-        return false
-      true
+      num_errors = (error for own error of @errors).length
+      return num_errors == 0
 
     isBlank: (attribute_names...) ->
       if attribute_names.length > 0
