@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "jquery": ">=2.0.0",
-    "lodash": "3.5.x",
+    "lodash": "3.5.0",
     "moment": "2.7.x",
     "cartograph": "0.1.x",
     "eventspitter": "0.x.x",
