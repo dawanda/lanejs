@@ -1276,9 +1276,6 @@ creates and returns the window.Foo.Bar.Baz object, setting it to a class.
           this._uid = this._generateUID();
         }
         this.$el = $(selector);
-        if (((typeof console !== "undefined" && console !== null ? console.warn : void 0) != null) && this.$el.length === 0) {
-          console.warn("No DOM elements found with selector '" + selector + "'");
-        }
         this.el = this.$el[0];
         if (((_ref = this._states) != null ? _ref[0] : void 0) != null) {
           this.initState(this._states[0]);
