@@ -52,8 +52,6 @@ namespace "Lib.StatefulWidget", ->
     constructor: ( selector ) ->
       @_uid ?= @_generateUID()
       @$el = $( selector )
-      if console?.warn? and @$el.length is 0
-        console.warn "No DOM elements found with selector '#{selector}'"
       @el = @$el[0]
       @initState @_states[0] if @_states?[0]?
       @_bindEvents()
