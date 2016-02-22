@@ -107,7 +107,7 @@ class FormatValidator extends BaseValidator
 
 # RangeValidator
 #
-# Validates the range of a number. Using 'min' and 'max' option. The error 
+# Validates the range of a number. Using 'min' and 'max' option. The error
 # message can be configured using the 'message' option.
 #
 class RangeValidator extends BaseValidator
@@ -123,7 +123,7 @@ class RangeValidator extends BaseValidator
     @attribute = attr
     @options.minFunc = @options.min if @options.min? and typeof @options.min is "function"
     @options.maxFunc = @options.max if @options.max? and typeof @options.max is "function"
-    @options.message ?= I18n.t("errors.messages.not_in_range")
+    @options.messageFunc = @options.message if @options.message? and typeof @options.message is "function"
 
   run: ( obj ) ->
     value = obj.get @attribute
@@ -135,6 +135,10 @@ class RangeValidator extends BaseValidator
       @options.min = @options.minFunc.call( obj )
     if @options.maxFunc?
       @options.max = @options.maxFunc.call( obj )
+    if @options.messageFunc?
+      @options.message = @options.messageFunc.call( obj )
+    else
+      @options.message ?= I18n.t("errors.messages.not_in_range")
 
     # checks if actual value of attribute is between min and max,
     # accounting for possible absence of one of them

@@ -201,6 +201,18 @@ describe "Lib.Validators", ->
       fv.validate @model
       expect( @model.addError ).toHaveBeenCalledWith "foo", "not in_range"
 
+    it "adds a validation that will construct the message dynamically", ->
+      messageFunc = -> 'at least ' + @get('bar')
+      foobar = { bar: 10, foo: 15 }
+      fv = new @V.RangeValidator "foo", min: 5, message: messageFunc
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        foobar[attr]
+      fv.validate @model
+      foobar.foo = 2
+      fv.validate @model
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "at least 10"
+
   describe "AcceptanceValidator", ->
 
     it "adds no errors if the attribute has the acceptance value", ->
