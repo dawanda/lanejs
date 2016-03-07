@@ -21,6 +21,14 @@ class BaseValidator extends Lib.Module
     # since it can be an arbitrary object
     @options[ key ] = val for key, val of opts
 
+  messageFor: ( obj, fallback, key = 'message' ) ->
+    # set message base on function
+    if @options[key]? and typeof @options[key] is "function"
+      @options[key] = @options[key].call( obj )
+
+    # set message to a default value if it is not defined
+    return @options[key] ?=  fallback
+
   # Runs validation on passed in object
   # Delegates to run if there is no if condition or it is true
   # @param obj - subject to validation, model instance object
@@ -63,8 +71,6 @@ class PresenceValidator extends BaseValidator
     # store attribute that is a subject to validation
     # NOTE: Looks like this belongs to BaseValidator ?
     @attribute = attr
-    # set message to a default value if it is not defined
-    @options.message ?= I18n.t("errors.messages.empty")
 
   # Performs presence validation
   # @param obj - subject to validation
@@ -76,7 +82,7 @@ class PresenceValidator extends BaseValidator
     unless value? and ( value + "" ).length > 0
       # otherwise add error to object with attribute and configured
       # message
-      obj.addError @attribute, @options.message
+      obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.empty"))
 
 # FormatValidator
 #
@@ -94,7 +100,6 @@ class FormatValidator extends BaseValidator
   constructor: ( attr, opts ) ->
     super attr, opts
     @attribute = attr
-    @options.message ?= I18n.t("errors.messages.invalid")
 
   # Performs presence validation
   # @param obj - subject to validation
@@ -103,11 +108,11 @@ class FormatValidator extends BaseValidator
     # ignore blank values and missing with option
     return unless value? and ( value + "" ).length > 0 and @options.with?
     # attribute value should match regex expression from with option
-    obj.addError @attribute, @options.message unless @options.with.test value
+    obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.invalid")) unless @options.with.test value
 
 # RangeValidator
 #
-# Validates the range of a number. Using 'min' and 'max' option. The error 
+# Validates the range of a number. Using 'min' and 'max' option. The error
 # message can be configured using the 'message' option.
 #
 class RangeValidator extends BaseValidator
@@ -123,7 +128,6 @@ class RangeValidator extends BaseValidator
     @attribute = attr
     @options.minFunc = @options.min if @options.min? and typeof @options.min is "function"
     @options.maxFunc = @options.max if @options.max? and typeof @options.max is "function"
-    @options.message ?= I18n.t("errors.messages.not_in_range")
 
   run: ( obj ) ->
     value = obj.get @attribute
@@ -141,14 +145,14 @@ class RangeValidator extends BaseValidator
     #
     # handles datetimes from momentjs
     if @options.min? and typeof @options.min is "object" and @options.min._isAMomentObject and !value.min(@options.min)
-      obj.addError @attribute, @options.message
+      obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.not_in_range"))
     else if @options.max? and typeof @options.max is "object" and @options.max._isAMomentObject and !value.max(@options.max)
-      obj.addError @attribute, @options.message
+      obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.not_in_range"))
     # handles everything else
     else if @options.min? and value < @options.min
-      obj.addError @attribute, @options.message
+      obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.not_in_range"))
     else if @options.max? and value > @options.max
-      obj.addError @attribute, @options.message
+      obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.not_in_range"))
 
 # AcceptanceValidator
 #
@@ -164,12 +168,11 @@ class AcceptanceValidator extends BaseValidator
   constructor: ( attr, opts ) ->
     super attr, opts
     @attribute = attr
-    @options.message ?= I18n.t("errors.messages.accepted")
     @options.accept  ?= "1"
 
   run: ( obj ) ->
     # attribute value should be equal to accept option value
-    obj.addError @attribute, @options.message unless obj.get( @attribute ) is @options.accept
+    obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.accepted")) unless obj.get( @attribute ) is @options.accept
 
 # LengthValidator
 #
@@ -193,9 +196,6 @@ class LengthValidator extends BaseValidator
   constructor: ( attr, opts ) ->
     super attr, opts
     @attribute = attr
-    @options.too_long ?= I18n.t("errors.messages.too_long.other")
-    @options.too_short ?= I18n.t("errors.messages.too_short.other")
-    @options.wrong_length ?= I18n.t("errors.messages.wrong_length.other")
 
   run: ( obj ) ->
     # gets attribute value's string representation
@@ -203,11 +203,11 @@ class LengthValidator extends BaseValidator
     # ignores blank values
     return unless value?
     # value should be <= max option if it is not missing
-    obj.addError @attribute, @options.too_long if @options.max? and value.length > @options.max
+    obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.too_long.other"), 'too_long') if @options.max? and value.length > @options.max
     # value should be >= min option if it is not missing
-    obj.addError @attribute, @options.too_short if @options.min? and value.length < @options.min
+    obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.too_short.other"), 'too_short') if @options.min? and value.length < @options.min
     # value should be == is option if it is not missing
-    obj.addError @attribute, @options.wrong_length if @options.is? and value.length != @options.is
+    obj.addError @attribute, @messageFor(obj, I18n.t("errors.messages.wrong_length.other"), 'wrong_length') if @options.is? and value.length != @options.is
 
 # ConfirmationValidator
 #
@@ -227,7 +227,6 @@ class ConfirmationValidator extends BaseValidator
     # NOTE Why not `@options.confirmed_attribute ?= @attribute + "_confirmation"` ?
     #      and than in `run` use @options.confirmed_attribute
     @confirmed_attribute = @options.confirmed_attribute || @attribute + "_confirmation"
-    @options.message ?= I18n.t("errors.messages.confirmed")
 
   run: ( obj ) ->
     # get both attributes' value
@@ -237,7 +236,7 @@ class ConfirmationValidator extends BaseValidator
     return unless value? and ( value + "" ).length > 0
     # both values should be the same
     unless value is confirmed_value
-      obj.addError @confirmed_attribute, @options.message
+      obj.addError @confirmed_attribute, @messageFor(obj, I18n.t("errors.messages.confirmed"))
 
 
 # export builtin validators under Lib.Validators namespace

@@ -47,6 +47,30 @@ describe "Lib.Validators", ->
       v.validate @model
       expect( @model.bar ).toHaveBeenCalled()
 
+    it "uses the specified fallback when message is not passed", ->
+      v = new @MyValidator "foo"
+      v.messageFor @model, 'fallback'
+      expect(v.options.message).toBe('fallback')
+
+    it "returns the passed message", ->
+      v = new @MyValidator "foo", message: 'custom message'
+      v.messageFor @model, 'fallback'
+      expect(v.options.message).toBe('custom message')
+
+    it "evaluates the message func in the contect of @model", ->
+      v = new @MyValidator "foo", message: -> 'not ' + @get('bar')
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        return 'you'
+      v.messageFor @model, 'fallback'
+      expect(v.options.message).toBe('not you')
+
+    it "can use any other key than message", ->
+      v = new @MyValidator "foo", too_cool: 'its cool man'
+      v.messageFor @model, 'fallback', 'too_cool'
+      expect(v.options.too_cool).toBe('its cool man')
+
+
+
   describe "PresenceValidator", ->
 
     it "adds no errors if the attribute is present", ->
@@ -201,6 +225,18 @@ describe "Lib.Validators", ->
       fv.validate @model
       expect( @model.addError ).toHaveBeenCalledWith "foo", "not in_range"
 
+    it "adds a validation that will construct the message dynamically", ->
+      messageFunc = -> 'at least ' + @get('bar')
+      foobar = { bar: 10, foo: 15 }
+      fv = new @V.RangeValidator "foo", min: 5, message: messageFunc
+      spyOn @model, "addError"
+      spyOn(@model, "get").and.callFake ( attr ) ->
+        foobar[attr]
+      fv.validate @model
+      foobar.foo = 2
+      fv.validate @model
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "at least 10"
+
   describe "AcceptanceValidator", ->
 
     it "adds no errors if the attribute has the acceptance value", ->
@@ -252,28 +288,28 @@ describe "Lib.Validators", ->
       expect( @model.addError ).not.toHaveBeenCalled()
 
     it "adds a validation that adds an error if the attribute is longer than max", ->
-      pv = new @V.LengthValidator "foo", max: 10
+      pv = new @V.LengthValidator "foo", max: 10, too_long: 'too_long'
       spyOn @model, "addError"
       spyOn(@model, "get").and.callFake ( attr ) ->
         return "longer than ten characters"
       pv.validate @model
-      expect( @model.addError ).toHaveBeenCalledWith "foo", "other"
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "too_long"
 
     it "adds a validation that adds an error if the attribute is shorter than min", ->
-      pv = new @V.LengthValidator "foo", min: 10
+      pv = new @V.LengthValidator "foo", min: 10, too_short: 'too_short'
       spyOn @model, "addError"
       spyOn(@model, "get").and.callFake ( attr ) ->
         return "too short"
       pv.validate @model
-      expect( @model.addError ).toHaveBeenCalledWith "foo", "other"
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "too_short"
 
     it "adds a validation that adds an error if the attribute length is different then 'is'", ->
-      pv = new @V.LengthValidator "foo", is: 10
+      pv = new @V.LengthValidator "foo", is: 10, wrong_length: 'wrong_length'
       spyOn @model, "addError"
       spyOn(@model, "get").and.callFake ( attr ) ->
         return "not ten characters"
       pv.validate @model
-      expect( @model.addError ).toHaveBeenCalledWith "foo", "other"
+      expect( @model.addError ).toHaveBeenCalledWith "foo", "wrong_length"
 
     it "adds a validation that adds no error if the attribute length is within boundaries", ->
       pv = new @V.LengthValidator "foo", min: 5, max: 20, is: 13
